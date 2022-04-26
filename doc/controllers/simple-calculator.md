@@ -24,7 +24,7 @@ CompletableFuture<Double> calculateAsync(
 
 | Parameter | Type | Tags | Description |
 |  --- | --- | --- | --- |
-| `operation` | [`OperationTypeEnum`](/doc/models/operation-type-enum.md) | Template, Required | The operator to apply on the variables |
+| `operation` | [`OperationTypeEnum`](../../doc/models/operation-type-enum.md) | Template, Required | The operator to apply on the variables |
 | `x` | `double` | Query, Required | The LHS value |
 | `y` | `double` | Query, Required | The RHS value |
 

@@ -13,6 +13,7 @@ import io.apimatic.examples.http.request.HttpMethod;
 import io.apimatic.examples.http.request.HttpRequest;
 import io.apimatic.examples.http.request.MultipartFileWrapper;
 import io.apimatic.examples.http.request.MultipartWrapper;
+import io.apimatic.examples.http.request.configuration.RetryConfiguration;
 import io.apimatic.examples.http.response.HttpResponse;
 import io.apimatic.examples.http.response.HttpStringResponse;
 import io.apimatic.examples.utilities.FileWrapper;
@@ -64,6 +65,8 @@ public class OkClient implements HttpClient {
         clientBuilder.readTimeout(httpClientConfig.getTimeout(), TimeUnit.SECONDS)
                 .writeTimeout(httpClientConfig.getTimeout(), TimeUnit.SECONDS)
                 .connectTimeout(httpClientConfig.getTimeout(), TimeUnit.SECONDS);
+
+        clientBuilder.addInterceptor(new HttpRedirectInterceptor(true));
         // If retries are allowed then RetryInterceptor must be registered
         if (httpClientConfig.getNumberOfRetries() > 0) {
             clientBuilder.callTimeout(httpClientConfig.getMaximumRetryWaitTime(), TimeUnit.SECONDS)
@@ -72,7 +75,6 @@ public class OkClient implements HttpClient {
             clientBuilder.callTimeout(httpClientConfig.getTimeout(), TimeUnit.SECONDS);
         }
 
-        clientBuilder.addInterceptor(new HttpRedirectInterceptor(true));
         this.client = clientBuilder.build();
     }
 
@@ -107,15 +109,16 @@ public class OkClient implements HttpClient {
      * Execute a given HttpRequest to get string/binary response back.
      * @param   httpRequest        The given HttpRequest to execute.
      * @param   hasBinaryResponse  Whether the response is binary or string.
+     * @param retryConfiguration The overridden retry configuration for request.
      * @return  CompletableFuture of HttpResponse after execution.
      */
     public CompletableFuture<HttpResponse> executeAsync(final HttpRequest httpRequest,
-            boolean hasBinaryResponse) {
+            boolean hasBinaryResponse, RetryConfiguration retryConfiguration) {
         okhttp3.Request okHttpRequest = convertRequest(httpRequest);
         
         RetryInterceptor retryInterceptor = getRetryInterceptor();
         if (retryInterceptor != null) {
-            retryInterceptor.addRequestEntry(okHttpRequest);
+            retryInterceptor.addRequestEntry(okHttpRequest, retryConfiguration);
         }
 
         final CompletableFuture<HttpResponse> callBack = new CompletableFuture<>();
@@ -135,6 +138,40 @@ public class OkClient implements HttpClient {
 
     /**
      * Execute a given HttpRequest to get string/binary response back.
+     * @param httpRequest The given HttpRequest to execute.
+     * @param hasBinaryResponse Whether the response is binary or string.
+     * @return CompletableFuture of HttpResponse after execution.
+     */
+    public CompletableFuture<HttpResponse> executeAsync(final HttpRequest httpRequest,
+            boolean hasBinaryResponse) {
+        return executeAsync(httpRequest, hasBinaryResponse,
+                new RetryConfiguration.Builder().build());
+    }
+
+    /**
+     * Execute a given HttpRequest to get string/binary response back.
+     * @param   httpRequest        The given HttpRequest to execute.
+     * @param   hasBinaryResponse  Whether the response is binary or string.
+     * @param   retryConfiguration The overridden retry configuration for request.
+     * @return  The converted http response.
+     * @throws  IOException exception to be thrown while converting response.
+     */
+    public HttpResponse execute(HttpRequest httpRequest, boolean hasBinaryResponse,
+            RetryConfiguration retryConfiguration) throws IOException {
+        okhttp3.Request okHttpRequest = convertRequest(httpRequest);
+        
+        RetryInterceptor retryInterceptor = getRetryInterceptor();
+        if (retryInterceptor != null) {
+            retryInterceptor.addRequestEntry(okHttpRequest, retryConfiguration);
+        }
+
+        okhttp3.Response okHttpResponse = null;
+        okHttpResponse = client.newCall(okHttpRequest).execute();
+        return convertResponse(httpRequest, okHttpResponse, hasBinaryResponse);
+    }
+
+    /**
+     * Execute a given HttpRequest to get string/binary response back.
      * @param   httpRequest        The given HttpRequest to execute.
      * @param   hasBinaryResponse  Whether the response is binary or string.
      * @return  The converted http response.
@@ -142,16 +179,7 @@ public class OkClient implements HttpClient {
      */
     public HttpResponse execute(HttpRequest httpRequest, boolean hasBinaryResponse)
             throws IOException {
-        okhttp3.Request okHttpRequest = convertRequest(httpRequest);
-        
-        RetryInterceptor retryInterceptor = getRetryInterceptor();
-        if (retryInterceptor != null) {
-            retryInterceptor.addRequestEntry(okHttpRequest);
-        }
-
-        okhttp3.Response okHttpResponse = null;
-        okHttpResponse = client.newCall(okHttpRequest).execute();
-        return convertResponse(httpRequest, okHttpResponse, hasBinaryResponse);
+        return execute(httpRequest, hasBinaryResponse, new RetryConfiguration.Builder().build());
     }
 
     /**
@@ -343,8 +371,8 @@ public class OkClient implements HttpClient {
                             okhttp3.MediaType.parse(wrapperObj.getHeaders().value("content-type"));
                 }
 
-                okhttp3.RequestBody body = okhttp3.RequestBody.create(wrapperObj.getFileWrapper().getFile(),
-                        mediaType);
+                okhttp3.RequestBody body = okhttp3.RequestBody
+                        .create(wrapperObj.getFileWrapper().getFile(), mediaType);
                 Headers fileWrapperHeaders = new Headers(wrapperObj.getHeaders());
                 fileWrapperHeaders.remove("content-type");
                 okhttp3.Headers.Builder fileWrapperHeadersBuilder =

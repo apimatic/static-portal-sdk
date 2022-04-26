@@ -9,6 +9,7 @@ package io.apimatic.examples.http.client;
 import io.apimatic.examples.http.Headers;
 import io.apimatic.examples.http.request.HttpBodyRequest;
 import io.apimatic.examples.http.request.HttpRequest;
+import io.apimatic.examples.http.request.configuration.RetryConfiguration;
 import io.apimatic.examples.http.response.HttpResponse;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
@@ -32,6 +33,16 @@ public interface HttpClient {
 
     /**
      * Execute a given HttpRequest to get string/binary response back.
+     * @param request The given HttpRequest to execute.
+     * @param hasBinaryResponse Whether the response is binary or string.
+     * @param retryConfiguration The overridden retry configuration for request.
+     * @return CompletableFuture of HttpResponse after execution.
+     */
+    public CompletableFuture<HttpResponse> executeAsync(final HttpRequest request,
+            boolean hasBinaryResponse, RetryConfiguration retryConfiguration);
+
+    /**
+     * Execute a given HttpRequest to get string/binary response back.
      * @param   request            The given HttpRequest to execute.
      * @param   hasBinaryResponse  Whether the response is binary or string.
      * @return  The converted http response.
@@ -39,6 +50,17 @@ public interface HttpClient {
      */
     public HttpResponse execute(final HttpRequest request, boolean hasBinaryResponse)
             throws IOException;
+
+    /**
+     * Execute a given HttpRequest to get string/binary response back.
+     * @param request The given HttpRequest to execute.
+     * @param hasBinaryResponse Whether the response is binary or string.
+     * @param retryConfiguration The overridden retry configuration for request.
+     * @return The converted http response.
+     * @throws IOException exception to be thrown while converting response.
+     */
+    public HttpResponse execute(final HttpRequest request, boolean hasBinaryResponse,
+            RetryConfiguration retryConfiguration) throws IOException;
 
     /**
      * Create a simple HTTP GET request.

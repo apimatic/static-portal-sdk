@@ -3,7 +3,7 @@
 
 ## Introduction
 
-Simple calculator API hosted on APIMATIC -
+Simple calculator API hosted on APIMATIC - testrun
 
 ## Building
 
@@ -73,7 +73,7 @@ Here, you can add code to initialize the client library and instantiate a *Contr
 
 ## Initialize the API Client
 
-**_Note:_** Documentation for the client can be found [here.](/doc/client.md)
+**_Note:_** Documentation for the client can be found [here.](doc/client.md)
 
 The following parameters are configurable for the API Client:
 
@@ -92,19 +92,19 @@ APIMATICCalculatorClient client = new APIMATICCalculatorClient.Builder()
 
 ## List of APIs
 
-* [Simple Calculator](/doc/controllers/simple-calculator.md)
+* [Simple Calculator](doc/controllers/simple-calculator.md)
 
 ## Classes Documentation
 
-* [Utility Classes](/doc/utility-classes.md)
-* [HttpRequest](/doc/http-request.md)
-* [HttpResponse](/doc/http-response.md)
-* [HttpStringResponse](/doc/http-string-response.md)
-* [HttpContext](/doc/http-context.md)
-* [HttpBodyRequest](/doc/http-body-request.md)
-* [Headers](/doc/headers.md)
-* [ApiException](/doc/api-exception.md)
-* [Configuration Interface](/doc/configuration-interface.md)
-* [HttpClientConfiguration](/doc/http-client-configuration.md)
-* [HttpClientConfiguration.Builder](/doc/http-client-configuration-builder.md)
+* [Utility Classes](doc/utility-classes.md)
+* [HttpRequest](doc/http-request.md)
+* [HttpResponse](doc/http-response.md)
+* [HttpStringResponse](doc/http-string-response.md)
+* [HttpContext](doc/http-context.md)
+* [HttpBodyRequest](doc/http-body-request.md)
+* [Headers](doc/headers.md)
+* [ApiException](doc/api-exception.md)
+* [Configuration Interface](doc/configuration-interface.md)
+* [HttpClientConfiguration](doc/http-client-configuration.md)
+* [HttpClientConfiguration.Builder](doc/http-client-configuration-builder.md)
 
