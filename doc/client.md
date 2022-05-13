@@ -10,13 +10,13 @@ The following parameters are configurable for the API Client:
 The API client can be initialized as follows:
 
 ```java
-APIMATICCalculatorClient client = new APIMATICCalculatorClient.Builder()
+APIMATICCalculatorTestClient client = new APIMATICCalculatorTestClient.Builder()
     .httpClientConfig(configBuilder -> configBuilder
             .timeout(0))
     .build();
 ```
 
-## APIMATIC CalculatorClient Class
+## APIMATIC Calculator-testClient Class
 
 The gateway for the SDK. This class acts as a factory for the Controllers and also holds the configuration of the SDK.
 
