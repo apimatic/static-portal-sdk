@@ -3,7 +3,7 @@
 
 ## Introduction
 
-Simple calculator API hosted on APIMATIC
+Simple calculator API hosted on APIMATIC for demo purposes
 
 ## Building
 
